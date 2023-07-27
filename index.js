@@ -11,7 +11,6 @@ const fun=async() => {
     let off=true;
     console.log("hello")
     const clean = client.ws.depth('ETHBTC', depth => {
-        //console.log("wsclient",depth.bidDepth[0].price)
         let prix=depth.bidDepth[0];
         if(prix?.price!=undefined){
             if(prix.price > 0.0635){
