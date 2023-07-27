@@ -9,7 +9,7 @@ const client= binance({
 
 const fun=async() => {
     let off=true;
-    console.log("hello")
+    console.log('bot lunch ..')
     const clean = client.ws.depth('ETHBTC', depth => {
         let prix=depth.bidDepth[0];
         if(prix?.price!=undefined){
