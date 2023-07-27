@@ -1,19 +1,15 @@
 const binance=require("binance-api-node").default;
+require('dotenv').config()
+
 
 const client= binance({
-    apiKey: 'NRqx3aGZ8xvQy00FJkxKjrddHIbwOSpmkqnl06165rSPbkPjNHSOFr98ZyKWGPO1',
-    apiSecret: 'NRqx3aGZ8xvQy00FJkxKjrddHIbwOSpmkqnl06165rSPbkPjNHSOFr98ZyKWGPO1',
+    apiKey: process.env.API_KEY,
+    apiSecret: process.env.SECRET_KRY,
 })
-/*const clean = client.ws.depth('ETHBTC', depth => {
-    console.log("wsclient",depth)
-})*/
 
 const fun=async() => {
     let off=true;
     console.log("hello")
-    /*const clean2 = await client.ws.marginUser(msg => {
-        console.log(msg.balances)
-    })*/
     const clean = client.ws.depth('ETHBTC', depth => {
         //console.log("wsclient",depth.bidDepth[0].price)
         let prix=depth.bidDepth[0];
@@ -57,22 +53,9 @@ const fun=async() => {
     if(off===true){
         setTimeout(() => {
             clean();
-            //clean2();
         },20*1000);
     }
 }
 fun();
 
-
-
-
-// After you're done
-/*try{
-    client.ws.depth('ETHBTC@1000ms', depth => {
-        console.log("wsclient",depth)
-    })
-    
-}catch{
-    console.log("failled")
-}*/
 
