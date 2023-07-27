@@ -1,25 +1,60 @@
-const express = require('express');
 const binance=require("binance-api-node").default;
-const app = express();  
-const PORT=4000;
-app.use(express.json());
-app.get('/',async(req,res) => 
-    res.json({msg:"hello "})
-});
-app.get("/api",async(req,res) => {
-    res.json({msg:"hello "})
+require('dotenv').config()
+
+
+const client= binance({
+    apiKey: process.env.API_KEY,
+    apiSecret: process.env.SECRET_KRY,
 })
 
-app.get("/bin",async(req,res) => {
-    const client= binance({
-        apiKey: 'API_key',
-        apiSecret: 'API_secret',
+const fun=async() => {
+    let off=true;
+    console.log("hello")
+    const clean = client.ws.depth('ETHBTC', depth => {
+        let prix=depth.bidDepth[0];
+        if(prix?.price!=undefined){
+            if(prix.price > 0.0635){
+                console.log('------vendre votre node-----',prix.price)
+                let sellord=async(pr) => {
+                    await client.orderTest({
+                        symbol: 'ETHBTC',
+                        side: 'SELL',
+                        quantity: '1',
+                        price: pr,
+                    }).then((data) => {
+                        console.log("sell order ID:",data.orderId)
+                    }).catch((err) => {
+                        console.log('cant sell',{msg:err.message})
+                    })
+                }
+                sellord(prix.price);
+            }else if(prix.price < 0.063){
+                console.log("------achter des node------",prix.price)
+                let buyord=async(pr) => {
+                    await client.orderTest({
+                        symbol: 'ETHBTC',
+                        side: 'BUY',
+                        quantity: '1',
+                        price: pr,
+                    }).then((data) => {
+                        console.log("buy order ID:",data.orderId)
+                    }).catch((err) => {
+                        console.log('cant buy',{msg:err.message})
+                    })
+                }
+                buyord(prix.price);
+            }else{
+                console.log('----pase de order----',prix.price)
+            }
+        }
+        
     })
-    let is_connect=await client.ping();
-    let server_time=await client.time();
-    let price=await client.prices({"symbol":"ETHBTC"});
+    if(off===true){
+        setTimeout(() => {
+            clean();
+        },20*1000);
+    }
+}
+fun();
 
-    res.json({is_connect,server_time,price});
-})
 
-app.listen(PORT,() => { console.log(`http://localhost:${PORT || 4000}`) });
